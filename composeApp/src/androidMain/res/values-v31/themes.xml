@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.SnakeGame" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Android 12+ Splash Screen: splash arka planıyla aynı renk, ikon yok -->
+        <item name="android:windowSplashScreenBackground">#0D0D0D</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@android:color/transparent</item>
+        <item name="android:windowSplashScreenAnimationDuration">0</item>
+        <item name="android:windowBackground">#0D0D0D</item>
+    </style>
+</resources>
