@@ -34,7 +34,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.snakegame.app.shared"
+    namespace = "com.ntapps.sssnap.shared"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

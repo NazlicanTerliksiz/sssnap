@@ -1,5 +1,6 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -8,6 +9,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
 }
 
+@Suppress("DEPRECATION")
 kotlin {
     androidTarget {
         compilerOptions {
@@ -51,12 +53,32 @@ kotlin {
     }
 }
 
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties: Properties? = if (keystorePropertiesFile.exists()) {
+    Properties().apply { load(keystorePropertiesFile.inputStream()) }
+} else null
+
 android {
-    namespace = "com.snakegame.app"
+    namespace = "com.ntapps.sssnap"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
+    if (keystoreProperties != null) {
+        signingConfigs {
+            create("release") {
+                val storePath = keystoreProperties["storeFile"]?.toString()
+                storeFile = storePath?.let { path ->
+                    val f = rootProject.file(path)
+                    if (f.exists()) f else file(path)
+                }
+                storePassword = keystoreProperties["storePassword"]?.toString()
+                keyAlias = keystoreProperties["keyAlias"]?.toString()
+                keyPassword = keystoreProperties["keyPassword"]?.toString()
+            }
+        }
+    }
+
     defaultConfig {
-        applicationId = "com.snakegame.app"
+        applicationId = "com.ntapps.sssnap"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -71,6 +93,9 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            if (keystoreProperties != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
     compileOptions {
