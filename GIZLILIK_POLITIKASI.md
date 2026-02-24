@@ -1,7 +1,7 @@
 # KVKK Aydınlatma Metni – Sssnap
 
 **Son güncelleme:** Şubat 2026  
-**Uygulama:** Sssnap (com.snakegame.app)
+**Uygulama:** Sssnap (com.ntapps.sssnap)
 
 ---
 
