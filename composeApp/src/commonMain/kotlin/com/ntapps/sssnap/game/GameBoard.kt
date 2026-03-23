@@ -3,17 +3,12 @@ package com.ntapps.sssnap.game
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
 import com.ntapps.sssnap.theme.AppColors
 
 @Composable
@@ -26,32 +21,27 @@ fun GameBoard(
             .fillMaxSize()
             .background(color = AppColors.Background)
     ) {
-        // Ekran genişliğine göre hücre boyutunu hesapla
         val cellSize = size.width / gameState.boardWidth
-        val gridHeight = gameState.boardHeight * cellSize
 
-        // Arka plan - grid alanı
-        drawRect(
-            color = AppColors.Background,
-            topLeft = Offset(0f, 0f),
-            size = Size(size.width, gridHeight)
-        )
-
-        // Grid çizgileri
-        drawGrid(gameState.boardWidth, gameState.boardHeight, cellSize)
+        // Grid çizgileri - tam ekran yüksekliğinde
+        drawGrid(gameState.boardWidth, cellSize, size.height)
 
         // Yem
         drawFood(gameState.food, cellSize)
 
         // Yılan
-        drawSnake(gameState.snake, cellSize, gameState.headImage)
+        drawSnakeSegments(
+            snake = gameState.snake,
+            cellSize = cellSize,
+            headImage = gameState.headImage
+        )
     }
 }
 
-private fun DrawScope.drawGrid(boardWidth: Int, boardHeight: Int, cellSize: Float) {
-    val gridHeight = boardHeight * cellSize
-    
-    // Dikey çizgiler - board yüksekliğine kadar
+private fun DrawScope.drawGrid(boardWidth: Int, cellSize: Float, screenHeight: Float) {
+    val rowCount = kotlin.math.floor(screenHeight / cellSize).toInt()
+    val gridHeight = rowCount * cellSize
+
     for (i in 0..boardWidth) {
         val posX = i * cellSize
         drawLine(
@@ -61,8 +51,8 @@ private fun DrawScope.drawGrid(boardWidth: Int, boardHeight: Int, cellSize: Floa
             strokeWidth = 0.5f
         )
     }
-    // Yatay çizgiler - board yüksekliğine kadar
-    for (i in 0..boardHeight) {
+
+    for (i in 0..rowCount) {
         val posY = i * cellSize
         drawLine(
             color = AppColors.GridLine,
@@ -85,36 +75,4 @@ private fun DrawScope.drawFood(food: Position, cellSize: Float) {
         size = Size(cellSize - padding * 2, cellSize - padding * 2),
         cornerRadius = CornerRadius(cellSize * 0.3f)
     )
-}
-
-private fun DrawScope.drawSnake(snake: Snake, cellSize: Float, headImage: ImageBitmap?) {
-    snake.body.forEachIndexed { index, position ->
-        val isHead = index == 0
-        val padding = cellSize * 0.1f
-
-        if (isHead && headImage != null) {
-            drawImage(
-                image = headImage,
-                dstOffset = IntOffset(
-                    (position.x * cellSize + padding).toInt(),
-                    (position.y * cellSize + padding).toInt()
-                ),
-                dstSize = IntSize(
-                    (cellSize - padding * 2).toInt(),
-                    (cellSize - padding * 2).toInt()
-                )
-            )
-        } else {
-            val color = if (isHead) AppColors.SnakeHead else AppColors.SnakeBody
-            drawRoundRect(
-                color = color,
-                topLeft = Offset(
-                    position.x * cellSize + padding,
-                    position.y * cellSize + padding
-                ),
-                size = Size(cellSize - padding * 2, cellSize - padding * 2),
-                cornerRadius = CornerRadius(cellSize * 0.2f)
-            )
-        }
-    }
 }

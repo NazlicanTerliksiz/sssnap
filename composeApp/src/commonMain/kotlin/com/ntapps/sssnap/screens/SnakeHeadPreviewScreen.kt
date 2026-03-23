@@ -12,16 +12,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ntapps.sssnap.game.Direction
+import com.ntapps.sssnap.game.Position
+import com.ntapps.sssnap.game.Snake
+import com.ntapps.sssnap.game.drawSnakeSegments
 import com.ntapps.sssnap.theme.AppColors
 
 @Composable
@@ -56,6 +55,8 @@ fun SnakeHeadPreviewScreenContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -192,46 +193,23 @@ private fun SnakePreviewCanvas(
         val totalCells = 4 // 1 kafa + 3 gövde
         val startX = (size.width - cellSize * totalCells) / 2
         val startY = (size.height - cellSize) / 2
-        val padding = cellSize * 0.08f
-        val cornerRadius = cellSize * 0.2f
 
-        // Yılan gövdesi (3 segment)
-        for (i in 1..3) {
-            drawRoundRect(
-                color = AppColors.SnakeBody,
-                topLeft = Offset(
-                    startX + (3 - i) * cellSize + padding,
-                    startY + padding
-                ),
-                size = Size(cellSize - padding * 2, cellSize - padding * 2),
-                cornerRadius = CornerRadius(cornerRadius)
-            )
-        }
+        val previewSnake = Snake(
+            body = listOf(
+                Position(3, 0),
+                Position(2, 0),
+                Position(1, 0),
+                Position(0, 0)
+            ),
+            direction = Direction.RIGHT
+        )
 
-        // Yılan kafası
-        if (headImage != null) {
-            drawImage(
-                image = headImage,
-                dstOffset = IntOffset(
-                    (startX + 3 * cellSize + padding).toInt(),
-                    (startY + padding).toInt()
-                ),
-                dstSize = IntSize(
-                    (cellSize - padding * 2).toInt(),
-                    (cellSize - padding * 2).toInt()
-                )
-            )
-        } else {
-            drawRoundRect(
-                color = AppColors.SnakeHead,
-                topLeft = Offset(
-                    startX + 3 * cellSize + padding,
-                    startY + padding
-                ),
-                size = Size(cellSize - padding * 2, cellSize - padding * 2),
-                cornerRadius = CornerRadius(cornerRadius)
-            )
-        }
+        drawSnakeSegments(
+            snake = previewSnake,
+            cellSize = cellSize,
+            headImage = headImage,
+            origin = Offset(startX, startY)
+        )
     }
 }
 

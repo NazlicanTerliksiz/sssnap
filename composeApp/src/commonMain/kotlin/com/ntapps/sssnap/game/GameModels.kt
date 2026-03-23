@@ -125,11 +125,25 @@ data class GameState(
         }
 
         fun generateFood(snakeBody: List<Position>, boardWidth: Int, boardHeight: Int): Position {
-            val allPositions = (0 until boardWidth).flatMap { x ->
-                (0 until boardHeight).map { y -> Position(x, y) }
+            val sideMargin = minOf(GameConstants.FOOD_SIDE_MARGIN, boardWidth / 4)
+            val verticalMargin = minOf(GameConstants.FOOD_VERTICAL_MARGIN, boardHeight / 4)
+
+            val innerXRange = sideMargin until (boardWidth - sideMargin)
+            val innerYRange = verticalMargin until (boardHeight - verticalMargin)
+
+            val preferredPositions = innerXRange.flatMap { x ->
+                innerYRange.map { y -> Position(x, y) }
+            } - snakeBody.toSet()
+
+            if (preferredPositions.isNotEmpty()) {
+                return preferredPositions.random()
             }
-            val availablePositions = allPositions - snakeBody.toSet()
-            return availablePositions.random()
+
+            val fallbackPositions = (0 until boardWidth).flatMap { x ->
+                (0 until boardHeight).map { y -> Position(x, y) }
+            } - snakeBody.toSet()
+
+            return fallbackPositions.random()
         }
     }
 }

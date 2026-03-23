@@ -30,7 +30,6 @@ class SnakeGameViewModel : ViewModel() {
      */
     fun updateBoardSize(screenWidth: Float, screenHeight: Float) {
         val cellSize = screenWidth / GameState.DEFAULT_BOARD_WIDTH
-        // Ekran yüksekliğine tam sığması için floor kullan (aşağı yuvarla)
         val calculatedHeight = kotlin.math.floor(screenHeight / cellSize).toInt()
         gameEngine.updateBoardSize(GameState.DEFAULT_BOARD_WIDTH, calculatedHeight)
     }

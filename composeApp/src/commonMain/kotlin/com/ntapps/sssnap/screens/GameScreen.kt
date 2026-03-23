@@ -13,9 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,30 +27,35 @@ fun GameScreen(
     onBackToMenu: () -> Unit
 ) {
     val gameState by viewModel.gameState.collectAsState()
-    val density = LocalDensity.current
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(AppColors.Background)
-            .onSizeChanged { size ->
-                // Ekran boyutuna göre board height hesapla
-                viewModel.updateBoardSize(size.width.toFloat(), size.height.toFloat())
-            }
-            .swipeGesture { direction ->
-                viewModel.changeDirection(direction)
-            }
     ) {
-        // Oyun alanı - tam ekran arka planda
-        GameBoard(
-            gameState = gameState,
-            modifier = Modifier.fillMaxSize()
-        )
+        // Oyun alanı - tam ekran (insets göz ardı)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .onSizeChanged { size ->
+                    viewModel.updateBoardSize(size.width.toFloat(), size.height.toFloat())
+                }
+                .swipeGesture { direction ->
+                    viewModel.changeDirection(direction)
+                }
+        ) {
+            GameBoard(
+                gameState = gameState,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
 
-        // Üst bar - skor ve menü (overlay)
+        // Üst bar - skor ve menü (overlay, safe area ile)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(top = 32.dp)
                 .padding(horizontal = 20.dp, vertical = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.Top
@@ -126,6 +129,7 @@ fun GameScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
+                            .navigationBarsPadding()
                             .padding(20.dp),
                         contentAlignment = Alignment.BottomEnd
                     ) {

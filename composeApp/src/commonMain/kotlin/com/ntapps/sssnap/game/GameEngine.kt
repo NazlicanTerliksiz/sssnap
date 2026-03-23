@@ -23,8 +23,8 @@ class GameEngine(
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
     private var gameJob: Job? = null
+    private var pendingDirection: Direction? = null
 
-    // Oyun hızı (milisaniye cinsinden) - düşük değer = hızlı oyun
     private val gameSpeed: Long = 150L
 
     /**
@@ -34,10 +34,12 @@ class GameEngine(
         if (width != boardWidth || height != boardHeight) {
             boardWidth = width
             boardHeight = height
-            // Sadece oyun başlamadıysa güncelle
-            if (_gameState.value.status == GameStatus.IDLE) {
-                val headImage = _gameState.value.headImage
-                _gameState.value = GameState.initial(boardWidth, boardHeight, headImage)
+            _gameState.update { state ->
+                if (state.status == GameStatus.IDLE) {
+                    GameState.initial(boardWidth, boardHeight, state.headImage)
+                } else {
+                    state.copy(boardWidth = boardWidth, boardHeight = boardHeight)
+                }
             }
         }
     }
@@ -89,6 +91,7 @@ class GameEngine(
      */
     fun resetGame() {
         gameJob?.cancel()
+        pendingDirection = null
         val highScore = _gameState.value.highScore
         val headImage = _gameState.value.headImage
         _gameState.value = GameState.initial(boardWidth, boardHeight, headImage).copy(highScore = highScore)
@@ -99,9 +102,10 @@ class GameEngine(
      */
     fun changeDirection(direction: Direction) {
         if (_gameState.value.status != GameStatus.RUNNING) return
-
-        _gameState.update { state ->
-            state.copy(snake = state.snake.changeDirection(direction))
+        
+        val currentDir = pendingDirection ?: _gameState.value.snake.direction
+        if (!currentDir.isOpposite(direction) && currentDir != direction) {
+            pendingDirection = direction
         }
     }
 
@@ -125,30 +129,29 @@ class GameEngine(
         _gameState.update { state ->
             if (state.status != GameStatus.RUNNING) return@update state
 
-            val snake = state.snake
-            val willEatFood = snake.head + snake.direction.delta == state.food
+            // Bekleyen yön değişikliğini uygula
+            val snake = pendingDirection?.let { dir ->
+                pendingDirection = null
+                state.snake.copy(direction = dir)
+            } ?: state.snake
 
-            // Yılanı hareket ettir
+            val willEatFood = snake.head + snake.direction.delta == state.food
             val newSnake = snake.move(grow = willEatFood)
 
-            // Çarpışma kontrolü
             if (newSnake.collidesWithWall(state.boardWidth, state.boardHeight) || newSnake.collidesWithSelf()) {
+                pendingDirection = null
                 val newHighScore = maxOf(state.score, state.highScore)
                 return@update state.copy(
+                    snake = snake,
                     status = GameStatus.GAME_OVER,
                     highScore = newHighScore
                 )
             }
 
-            // Yem yeme kontrolü
             if (willEatFood) {
                 val newScore = state.score + 10
                 val newFood = GameState.generateFood(newSnake.body, state.boardWidth, state.boardHeight)
-                state.copy(
-                    snake = newSnake,
-                    food = newFood,
-                    score = newScore
-                )
+                state.copy(snake = newSnake, food = newFood, score = newScore)
             } else {
                 state.copy(snake = newSnake)
             }
