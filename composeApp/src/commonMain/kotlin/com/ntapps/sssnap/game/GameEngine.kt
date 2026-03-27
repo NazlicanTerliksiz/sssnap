@@ -1,6 +1,7 @@
 package com.ntapps.sssnap.game
 
 import androidx.compose.ui.graphics.ImageBitmap
+import com.ntapps.sssnap.platform.HighScoreStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -10,16 +11,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-/**
- * Oyun motorunu yöneten sınıf
- */
 class GameEngine(
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope,
+    private val highScoreStorage: HighScoreStorage
 ) {
     private var boardWidth: Int = GameState.DEFAULT_BOARD_WIDTH
     private var boardHeight: Int = GameState.DEFAULT_BOARD_HEIGHT
     
-    private val _gameState = MutableStateFlow(GameState.initial(boardWidth, boardHeight))
+    private val _gameState = MutableStateFlow(
+        GameState.initial(boardWidth, boardHeight).copy(highScore = highScoreStorage.getHighScore())
+    )
     val gameState: StateFlow<GameState> = _gameState.asStateFlow()
 
     private var gameJob: Job? = null
@@ -147,6 +148,9 @@ class GameEngine(
             if (newSnake.collidesWithWall(state.boardWidth, state.boardHeight) || newSnake.collidesWithSelf()) {
                 pendingDirection = null
                 val newHighScore = maxOf(state.score, state.highScore)
+                if (newHighScore > state.highScore) {
+                    highScoreStorage.saveHighScore(newHighScore)
+                }
                 return@update state.copy(
                     snake = snake,
                     status = GameStatus.GAME_OVER,

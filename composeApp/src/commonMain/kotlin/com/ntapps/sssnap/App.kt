@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ntapps.sssnap.navigation.Screen
 import com.ntapps.sssnap.navigation.rememberNavigationState
 import com.ntapps.sssnap.platform.rememberImagePickerLauncher
+import com.ntapps.sssnap.platform.getHighScoreStorage
 import com.ntapps.sssnap.platform.getPrivacyPreferences
 import com.ntapps.sssnap.screens.GameScreen
 import com.ntapps.sssnap.screens.MainMenuScreen
@@ -33,7 +34,8 @@ private val DarkColorScheme = darkColorScheme(
 fun App() {
     MaterialTheme(colorScheme = DarkColorScheme) {
         val navigationState = rememberNavigationState()
-        val viewModel: SnakeGameViewModel = viewModel { SnakeGameViewModel() }
+        val highScoreStorage = remember { getHighScoreStorage() }
+        val viewModel: SnakeGameViewModel = viewModel { SnakeGameViewModel(highScoreStorage) }
         
         // Preview ekranı için geçici görsel state
         var previewHeadImage by remember { mutableStateOf<ImageBitmap?>(null) }

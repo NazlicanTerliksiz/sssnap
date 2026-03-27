@@ -6,15 +6,14 @@ import androidx.lifecycle.viewModelScope
 import com.ntapps.sssnap.game.Direction
 import com.ntapps.sssnap.game.GameEngine
 import com.ntapps.sssnap.game.GameState
+import com.ntapps.sssnap.platform.HighScoreStorage
 import kotlinx.coroutines.flow.StateFlow
 
-/**
- * Snake Game için ViewModel
- * UI ve GameEngine arasındaki köprü görevi görür
- */
-class SnakeGameViewModel : ViewModel() {
+class SnakeGameViewModel(
+    highScoreStorage: HighScoreStorage
+) : ViewModel() {
     
-    private val gameEngine = GameEngine(viewModelScope)
+    private val gameEngine = GameEngine(viewModelScope, highScoreStorage)
     
     val gameState: StateFlow<GameState> = gameEngine.gameState
 

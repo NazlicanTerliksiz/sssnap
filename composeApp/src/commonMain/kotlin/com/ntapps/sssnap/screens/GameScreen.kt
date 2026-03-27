@@ -77,7 +77,7 @@ fun GameScreen(
                     text = gameState.highScore.toString(),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium,
-                    color = AppColors.Secondary
+                    color = AppColors.Primary
                 )
                 Text(
                     text = "en iyi",
