@@ -22,6 +22,7 @@ import com.ntapps.sssnap.game.Position
 import com.ntapps.sssnap.game.Snake
 import com.ntapps.sssnap.game.drawSnakeSegments
 import com.ntapps.sssnap.theme.AppColors
+import com.ntapps.sssnap.theme.AppIcons
 
 @Composable
 fun SnakeHeadPreviewScreen(
@@ -60,24 +61,18 @@ fun SnakeHeadPreviewScreenContent(
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Üst bar - sadece geri ikonu
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Start
             ) {
-                // Geri ikonu - daha büyük, arka plan yok
-                Box(
+                Icon(
+                    imageVector = AppIcons.Back,
+                    contentDescription = "Back",
+                    tint = AppColors.Primary,
                     modifier = Modifier
-                        .size(48.dp)
-                        .clickable(onClick = onCancel),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "←",
-                        fontSize = 24.sp,
-                        color = AppColors.Primary
-                    )
-                }
+                        .size(32.dp)
+                        .clickable(onClick = onCancel)
+                )
             }
 
             Spacer(modifier = Modifier.height(40.dp))

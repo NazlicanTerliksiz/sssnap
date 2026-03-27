@@ -77,6 +77,8 @@ fun App() {
             is Screen.MainMenu -> {
                 MainMenuScreen(
                     onPlayClick = {
+                        viewModel.resetGame()
+                        viewModel.startGame()
                         navigationState.navigateTo(Screen.Game)
                     },
                     onCustomizeSnakeClick = {

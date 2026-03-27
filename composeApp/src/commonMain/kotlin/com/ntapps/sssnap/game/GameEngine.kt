@@ -25,7 +25,7 @@ class GameEngine(
     private var gameJob: Job? = null
     private var pendingDirection: Direction? = null
 
-    private val gameSpeed: Long = 150L
+    private val initialSnakeLength = 3
 
     /**
      * Board boyutunu günceller (ekran boyutuna göre)
@@ -112,11 +112,17 @@ class GameEngine(
     /**
      * Oyun döngüsünü başlatır
      */
+    private fun calculateSpeed(snakeLength: Int): Long {
+        val foodEaten = (snakeLength - initialSnakeLength).coerceAtLeast(0)
+        val speed = GameConstants.INITIAL_SPEED_MS - foodEaten * GameConstants.SPEED_DECREASE_PER_FOOD
+        return speed.coerceAtLeast(GameConstants.MIN_SPEED_MS)
+    }
+
     private fun startGameLoop() {
         gameJob?.cancel()
         gameJob = scope.launch {
             while (_gameState.value.status == GameStatus.RUNNING) {
-                delay(gameSpeed)
+                delay(calculateSpeed(_gameState.value.snake.body.size))
                 updateGame()
             }
         }
