@@ -5,17 +5,22 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import com.ntapps.sssnap.theme.AppColors
+import com.ntapps.sssnap.theme.AppIcons
 
 @Composable
 fun GameBoard(
     gameState: GameState,
     modifier: Modifier = Modifier
 ) {
+    val foodPainter = rememberVectorPainter(image = AppIcons.Food)
+
     Canvas(
         modifier = modifier
             .fillMaxSize()
@@ -23,13 +28,22 @@ fun GameBoard(
     ) {
         val cellSize = size.width / gameState.boardWidth
 
-        // Grid çizgileri - tam ekran yüksekliğinde
         drawGrid(gameState.boardWidth, cellSize, size.height)
 
-        // Yem
-        drawFood(gameState.food, cellSize)
+        val padding = cellSize * 0.15f
+        val iconSize = cellSize - padding * 2
+        translate(
+            left = gameState.food.x * cellSize + padding,
+            top = gameState.food.y * cellSize + padding
+        ) {
+            with(foodPainter) {
+                draw(
+                    size = Size(iconSize, iconSize),
+                    colorFilter = ColorFilter.tint(AppColors.Food)
+                )
+            }
+        }
 
-        // Yılan
         drawSnakeSegments(
             snake = gameState.snake,
             cellSize = cellSize,
@@ -63,16 +77,3 @@ private fun DrawScope.drawGrid(boardWidth: Int, cellSize: Float, screenHeight: F
     }
 }
 
-private fun DrawScope.drawFood(food: Position, cellSize: Float) {
-    val padding = cellSize * 0.2f
-    
-    drawRoundRect(
-        color = AppColors.Food,
-        topLeft = Offset(
-            food.x * cellSize + padding,
-            food.y * cellSize + padding
-        ),
-        size = Size(cellSize - padding * 2, cellSize - padding * 2),
-        cornerRadius = CornerRadius(cellSize * 0.3f)
-    )
-}

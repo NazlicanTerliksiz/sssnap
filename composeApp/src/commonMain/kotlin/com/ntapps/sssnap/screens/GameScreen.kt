@@ -59,8 +59,8 @@ fun GameScreen(
             Column {
                 Text(
                     text = gameState.score.toString(),
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
                     color = AppColors.Primary
                 )
                 Text(

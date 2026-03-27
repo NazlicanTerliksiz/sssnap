@@ -20,7 +20,7 @@ object AppColors {
     val SnakeBody = Primary.copy(alpha = 0.7f)
     
     // Yem rengi
-    val Food = Color(0xFFFF6B6B)
+    val Food = Color(0xFFFFEE8C)
     
     // Metin renkleri
     val TextPrimary = Color.White
