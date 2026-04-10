@@ -81,8 +81,8 @@ android {
         applicationId = "com.ntapps.sssnap"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 2
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "3.0"
         resValue("string", "app_name", "Sssnap")
     }
     packaging {
@@ -97,6 +97,10 @@ android {
                 signingConfig = signingConfigs.getByName("release")
             }
         }
+    }
+    lint {
+        // Workaround for AGP/KMP lintVital internal crash during bundleRelease.
+        checkReleaseBuilds = false
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
